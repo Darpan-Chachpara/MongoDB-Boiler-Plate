@@ -1,0 +1,58 @@
+
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+ const personSchema = Schema({
+   _id: Schema.Types.ObjectId,
+   name: String,
+   age: Number,
+   gender: String,
+   contact: Number,
+   email: String,
+   stories: [{ type: String, ref: 'Story' }]
+ });
+
+ const storySchema = Schema({
+   author: { type: Schema.Types.ObjectId, ref: 'Person' },
+   title: String,
+   fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
+ });
+
+ const Person = mongoose.model('Person', personSchema);
+ const Story = mongoose.model('Story', storySchema);
+ module.exports = {Person, Story}
+
+
+ const author = new Person({
+     _id: new mongoose.Types.ObjectId(),
+     name: 'Darpan Chachpara',
+     age: 24,
+     gender: "Male",
+     contact: 75868,
+     email: "darpan@gmail.com",
+     stories: "Robbery"
+   });
+   author.save(function (err) {
+     if (err) return handleError(err);
+
+
+     const story1 = new Story({
+       title: 'Money Heist',
+       author: author._id,    // assign the _id from the person
+       fans: "Dc_126_111"
+     });
+     story1.save(function (err) {
+       if (err) return handleError(err);
+       // that's it!
+     });
+   });
+
+
+   Story.
+   findOne({ title: 'Money Heist' }).
+   populate('author').
+   exec(function (err, story) {
+     if (err) return handleError(err);
+     console.log('The author is %s', story.author.name);
+     // prints "The author is Darpan Chachpara"
+   });
